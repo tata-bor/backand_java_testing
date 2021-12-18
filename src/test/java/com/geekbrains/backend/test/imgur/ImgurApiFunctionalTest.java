@@ -1,9 +1,10 @@
 package com.geekbrains.backend.test.imgur;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.specification.ResponseSpecification;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.*;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
@@ -12,8 +13,20 @@ import static org.hamcrest.Matchers.is;
 public class ImgurApiFunctionalTest extends ImgurApiAbstractTest {
 
     private static String CURRENT_IMAGE_ID;
+    ResponseSpecification responseSpecification = null;
 
-    @Test
+    @BeforeEach
+    void beforeTest() {
+        responseSpecification = new ResponseSpecBuilder()
+                .expectStatusCode(200)
+                .expectStatusLine("HTTP/1.1 200 OK")
+                .expectContentType(ContentType.JSON)
+                .expectResponseTime(Matchers.lessThan(5000L))
+                .expectHeader("Access-Control-Allow-Credentials", "true")
+                .build();
+    }
+
+        @Test
     @Order(1)
     void getAccountBase() {
         String userName = "tatabor";
@@ -27,6 +40,7 @@ public class ImgurApiFunctionalTest extends ImgurApiAbstractTest {
                 .all()
                 .when()
                 .get("account/" + userName);
+
     }
 
     @Test
